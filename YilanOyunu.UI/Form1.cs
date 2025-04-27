@@ -15,8 +15,7 @@ namespace YilanOyunu.UI
 {
     public partial class Form1 : Form
     {
-        int hýz=100;
-        List<string> OyunTuru = new List<string> { "Kolay", "Orta", "Zor" };
+        int hiz=100;
         private List<Circle> Snake = new List<Circle>();
         private Circle food = new Circle();
         int maxWidth;
@@ -182,7 +181,7 @@ namespace YilanOyunu.UI
                 Snake.Add(body);
             }
             food = new Circle { X = rnd.Next(2, maxWidth), Y = rnd.Next(2, maxHeight) };
-            GameTimer.Interval = hýz;
+            GameTimer.Interval = hiz;
             GameTimer.Start();
         }
         private void EatFood()
@@ -300,7 +299,7 @@ namespace YilanOyunu.UI
             pnlGiris.Visible = false;
             GameTimer.Interval = 150;
             pnlGiris.Visible = false;
-            hýz = GameTimer.Interval;
+            hiz = GameTimer.Interval;
             lblGosterge.Text = "SEVÝYENÝZ : KOLAY";
         }
 
@@ -309,7 +308,7 @@ namespace YilanOyunu.UI
             pnlGiris.Visible = false;
             GameTimer.Interval = 90;
             pnlGiris.Visible = false;
-            hýz = GameTimer.Interval;
+            hiz = GameTimer.Interval;
             lblGosterge.Text = "SEVÝYENÝZ : ORTA";
         }
 
@@ -318,7 +317,7 @@ namespace YilanOyunu.UI
             pnlGiris.Visible = false;
             GameTimer.Interval = 50;
             pnlGiris.Visible = false;
-            hýz = GameTimer.Interval;
+            hiz = GameTimer.Interval;
             lblGosterge.Text = "SEVÝYENÝZ : ZOR";
         }
         private void PanelKucultme()
