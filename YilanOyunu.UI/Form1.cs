@@ -15,7 +15,7 @@ namespace YilanOyunu.UI
 {
     public partial class Form1 : Form
     {
-        int hiz=100;
+        int hiz = 100;
         private List<Circle> Snake = new List<Circle>();
         private Circle food = new Circle();
         int maxWidth;
@@ -26,21 +26,23 @@ namespace YilanOyunu.UI
 
         Random rnd = new Random();
         bool goLeft, goRight, goDown, goUp;
+
+        private Keys customUpKey;
+        private Keys customDownKey;
+        private Keys customLeftKey;
+        private Keys customRightKey;
+
         public Form1()
         {
             InitializeComponent();
             new Settings();
-
         }
-
         private void btnBasla_Click(object sender, EventArgs e)
         {
             RestartGame();
         }
-
         private void GameTimer_Tick(object sender, EventArgs e)
         {
-
             if (goLeft)
             {
                 Settings.directions = "left";
@@ -57,13 +59,11 @@ namespace YilanOyunu.UI
             {
                 Settings.directions = "up";
             }
-            // end of directions
 
             for (int i = Snake.Count - 1; i >= 0; i--)
             {
                 if (i == 0)
                 {
-
                     switch (Settings.directions)
                     {
                         case "left":
@@ -96,8 +96,6 @@ namespace YilanOyunu.UI
                     {
                         Snake[i].Y = 0;
                     }
-
-
                     if (Snake[i].X == food.X && Snake[i].Y == food.Y)
                     {
                         EatFood();
@@ -109,11 +107,9 @@ namespace YilanOyunu.UI
                         if (Snake[i].X == Snake[j].X && Snake[i].Y == Snake[j].Y)
                         {
                             GameOver();
+                            return;
                         }
-
                     }
-
-
                 }
                 else
                 {
@@ -121,12 +117,8 @@ namespace YilanOyunu.UI
                     Snake[i].Y = Snake[i - 1].Y;
                 }
             }
-
-
             pnlYilan.Invalidate();
-           
         }
-
         private void UpdatePictureBox(object sender, PaintEventArgs e)
         {
             Graphics canvas = e.Graphics;
@@ -152,7 +144,6 @@ namespace YilanOyunu.UI
                     ));
             }
 
-
             canvas.FillEllipse(Brushes.DarkRed, new Rectangle
             (
             food.X * Settings.Width,
@@ -173,7 +164,7 @@ namespace YilanOyunu.UI
             lblScore.Text = score.ToString();
 
             Circle head = new Circle { X = 10, Y = 5 };
-            Snake.Add(head); // adding the head part of the snake to the list
+            Snake.Add(head); 
 
             for (int i = 0; i < 10; i++)
             {
@@ -205,8 +196,8 @@ namespace YilanOyunu.UI
         private void GameOver()
         {
             GameTimer.Stop();
+            MessageBox.Show("SKORUNUZ: " + score);
             btnBasla.Enabled = true;
-
 
             if (score > highscore)
             {
@@ -216,19 +207,18 @@ namespace YilanOyunu.UI
                 lblHighScore.ForeColor = Color.Maroon;
                 lblHighScore.TextAlign = ContentAlignment.MiddleCenter;
             }
-            DialogResult result = MessageBox.Show(
-                    "Oyunu yeniden baþlatmak istiyor musun?",  // Mesaj
-              "Yeniden Baþlat",                          // Baþlýk
-                 MessageBoxButtons.YesNo,                   // Butonlar: Evet ve Hayýr
+                 DialogResult result = MessageBox.Show(
+                 "Oyunu yeniden baþlatmak istiyor musun?",  
+                 "Yeniden Baþlat",                          
+                 MessageBoxButtons.YesNo,                   
                  MessageBoxIcon.Question);
 
-            // Sonucu kontrol et
             if (result == DialogResult.Yes)
             {
                 DialogResult otherResult = MessageBox.Show(
-                    "Zorluk seviyenizi deðiþtirmek istiyor musun?",  // Mesaj
-              "SEVÝYE",                          // Baþlýk
-                 MessageBoxButtons.YesNo,                   // Butonlar: Evet ve Hayýr
+                    "Zorluk seviyenizi deðiþtirmek istiyor musun?",  
+                    "SEVÝYE",                         
+                 MessageBoxButtons.YesNo,                  
                  MessageBoxIcon.Question);
                 if (otherResult == DialogResult.Yes)
                 {
@@ -238,50 +228,47 @@ namespace YilanOyunu.UI
                 {
                     RestartGame();
                 }
-
             }
             else
             {
-                // Hayýr seçildiðinde yapýlacaklar
                 Application.Exit();
             }
         }
 
         private void KeyIsDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Left && Settings.directions != "right")
+            if (e.KeyCode == customLeftKey && Settings.directions != "right")
             {
                 goLeft = true;
             }
-            if (e.KeyCode == Keys.Right && Settings.directions != "left")
+            if (e.KeyCode == customRightKey && Settings.directions != "left")
             {
                 goRight = true;
             }
-            if (e.KeyCode == Keys.Up && Settings.directions != "down")
+            if (e.KeyCode == customUpKey && Settings.directions != "down")
             {
                 goUp = true;
             }
-            if (e.KeyCode == Keys.Down && Settings.directions != "up")
+            if (e.KeyCode == customDownKey && Settings.directions != "up")
             {
                 goDown = true;
             }
         }
-
         private void KeyIsUp(object? sender, KeyEventArgs e) // Fix for CS8622: Add nullable annotation to match the delegate's nullability.  
         {
-            if (e.KeyCode == Keys.Left)
+            if (e.KeyCode == customLeftKey)
             {
                 goLeft = false;
             }
-            if (e.KeyCode == Keys.Right)
+            if (e.KeyCode == customRightKey)
             {
                 goRight = false;
             }
-            if (e.KeyCode == Keys.Up)
+            if (e.KeyCode == customUpKey)
             {
                 goUp = false;
             }
-            if (e.KeyCode == Keys.Down)
+            if (e.KeyCode == customDownKey)
             {
                 goDown = false;
             }
@@ -293,7 +280,6 @@ namespace YilanOyunu.UI
                 GameTimer.Interval -= 10;
             }
         }
-
         private void btnKolay_Click(object sender, EventArgs e)
         {
             pnlGiris.Visible = false;
@@ -302,7 +288,6 @@ namespace YilanOyunu.UI
             hiz = GameTimer.Interval;
             lblGosterge.Text = "SEVÝYENÝZ : KOLAY";
         }
-
         private void btnOrta_Click(object sender, EventArgs e)
         {
             pnlGiris.Visible = false;
@@ -311,7 +296,6 @@ namespace YilanOyunu.UI
             hiz = GameTimer.Interval;
             lblGosterge.Text = "SEVÝYENÝZ : ORTA";
         }
-
         private void btnZor_Click(object sender, EventArgs e)
         {
             pnlGiris.Visible = false;
@@ -322,21 +306,19 @@ namespace YilanOyunu.UI
         }
         private void PanelKucultme()
         {
-           
-                if (score % 5 == 0 && score >=5) 
+            if (score % 5 == 0 && score >= 5)
+            {
+                if (pnlYilan.Width > 200 && pnlYilan.Height > 200)
                 {
-                    if (pnlYilan.Width > 200 && pnlYilan.Height > 200)
-                    {
-                        pnlYilan.Width -= 50;
-                        pnlYilan.Height -= 50;
+                    pnlYilan.Width -= 50;
+                    pnlYilan.Height -= 50;
 
-                        maxWidth = pnlYilan.Width / Settings.Width - 1;
-                        maxHeight = pnlYilan.Height / Settings.Height - 1;
+                    maxWidth = pnlYilan.Width / Settings.Width - 1;
+                    maxHeight = pnlYilan.Height / Settings.Height - 1;
 
                     ResetFood();
-                    }
                 }
-
+            }
         }
         private void ResetFood()
         {
@@ -346,6 +328,14 @@ namespace YilanOyunu.UI
                 Y = rnd.Next(0, maxHeight)
             };
         }
+        private void btnTusSecimi_Click(object sender, EventArgs e)
+        {
+            customUpKey = (Keys)Enum.Parse(typeof(Keys), txtUpKey.Text.ToUpper());
+            customDownKey = (Keys)Enum.Parse(typeof(Keys), txtDownKey.Text.ToUpper());
+            customLeftKey = (Keys)Enum.Parse(typeof(Keys), txtLeftKey.Text.ToUpper());
+            customRightKey = (Keys)Enum.Parse(typeof(Keys), txtRightKey.Text.ToUpper());
 
+            MessageBox.Show("Tuþlar baþarýyla ayarlandý!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }

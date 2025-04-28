@@ -37,6 +37,16 @@
             lblScore = new Label();
             lblHighScore = new Label();
             pnlGiris = new Panel();
+            txtLeftKey = new TextBox();
+            txtRightKey = new TextBox();
+            txtDownKey = new TextBox();
+            txtUpKey = new TextBox();
+            btnTusSecimi = new Button();
+            label6 = new Label();
+            label5 = new Label();
+            label4 = new Label();
+            label3 = new Label();
+            label2 = new Label();
             label1 = new Label();
             btnZor = new Button();
             btnOrta = new Button();
@@ -113,6 +123,16 @@
             // pnlGiris
             // 
             pnlGiris.BackColor = Color.FromArgb(0, 64, 0);
+            pnlGiris.Controls.Add(txtLeftKey);
+            pnlGiris.Controls.Add(txtRightKey);
+            pnlGiris.Controls.Add(txtDownKey);
+            pnlGiris.Controls.Add(txtUpKey);
+            pnlGiris.Controls.Add(btnTusSecimi);
+            pnlGiris.Controls.Add(label6);
+            pnlGiris.Controls.Add(label5);
+            pnlGiris.Controls.Add(label4);
+            pnlGiris.Controls.Add(label3);
+            pnlGiris.Controls.Add(label2);
             pnlGiris.Controls.Add(label1);
             pnlGiris.Controls.Add(btnZor);
             pnlGiris.Controls.Add(btnOrta);
@@ -122,11 +142,99 @@
             pnlGiris.Size = new Size(872, 586);
             pnlGiris.TabIndex = 7;
             // 
+            // txtLeftKey
+            // 
+            txtLeftKey.Location = new Point(769, 221);
+            txtLeftKey.Name = "txtLeftKey";
+            txtLeftKey.Size = new Size(100, 25);
+            txtLeftKey.TabIndex = 13;
+            // 
+            // txtRightKey
+            // 
+            txtRightKey.Location = new Point(633, 219);
+            txtRightKey.Name = "txtRightKey";
+            txtRightKey.Size = new Size(100, 25);
+            txtRightKey.TabIndex = 12;
+            // 
+            // txtDownKey
+            // 
+            txtDownKey.Location = new Point(517, 221);
+            txtDownKey.Name = "txtDownKey";
+            txtDownKey.Size = new Size(100, 25);
+            txtDownKey.TabIndex = 11;
+            // 
+            // txtUpKey
+            // 
+            txtUpKey.Location = new Point(325, 219);
+            txtUpKey.Name = "txtUpKey";
+            txtUpKey.Size = new Size(100, 25);
+            txtUpKey.TabIndex = 10;
+            // 
+            // btnTusSecimi
+            // 
+            btnTusSecimi.Location = new Point(204, 219);
+            btnTusSecimi.Name = "btnTusSecimi";
+            btnTusSecimi.Size = new Size(75, 23);
+            btnTusSecimi.TabIndex = 9;
+            btnTusSecimi.Text = "secim";
+            btnTusSecimi.UseVisualStyleBackColor = true;
+            btnTusSecimi.Click += btnTusSecimi_Click;
+            // 
+            // label6
+            // 
+            label6.AutoSize = true;
+            label6.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            label6.Location = new Point(753, 184);
+            label6.Name = "label6";
+            label6.Size = new Size(40, 17);
+            label6.TabIndex = 8;
+            label6.Text = "SOL :";
+            // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            label5.Location = new Point(661, 184);
+            label5.Name = "label5";
+            label5.Size = new Size(45, 17);
+            label5.TabIndex = 7;
+            label5.Text = "SAĞ : ";
+            // 
+            // label4
+            // 
+            label4.AutoSize = true;
+            label4.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            label4.Location = new Point(545, 184);
+            label4.Name = "label4";
+            label4.Size = new Size(54, 17);
+            label4.TabIndex = 6;
+            label4.Text = "AŞAĞI :";
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 9.75F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            label3.Location = new Point(350, 182);
+            label3.Name = "label3";
+            label3.Size = new Size(54, 17);
+            label3.TabIndex = 5;
+            label3.Text = "YUKARI";
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 162);
+            label2.Location = new Point(45, 176);
+            label2.Name = "label2";
+            label2.Size = new Size(234, 25);
+            label2.TabIndex = 4;
+            label2.Text = "TUŞ TAKIMINIZI SEÇİNİZ";
+            // 
             // label1
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Snap ITC", 26.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
-            label1.Location = new Point(51, 173);
+            label1.Location = new Point(45, 62);
             label1.Name = "label1";
             label1.Size = new Size(796, 45);
             label1.TabIndex = 3;
@@ -218,5 +326,15 @@
         private Button btnKolay;
         private Label label1;
         private Label lblGosterge;
+        private Label label2;
+        private Label label5;
+        private Label label4;
+        private Label label3;
+        private Label label6;
+        private Button btnTusSecimi;
+        private TextBox txtLeftKey;
+        private TextBox txtRightKey;
+        private TextBox txtDownKey;
+        private TextBox txtUpKey;
     }
 }

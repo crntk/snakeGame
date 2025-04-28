@@ -13,8 +13,8 @@ namespace YilanOyunu.UI
         public static string directions;
         public Settings()
         {
-            Width = 16;
-            Height = 16;
+            Width = 18;
+            Height = 18;
             directions= "left"; 
         }
     }
