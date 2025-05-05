@@ -10,11 +10,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics.Eventing.Reader;
+using YilanOyunu.UI.Models;
 
 namespace YilanOyunu.UI
 {
     public partial class Form1 : Form
     {
+        private readonly SnakeDbContext _dbContext = new SnakeDbContext();
+
+        Kullanici Kullanici = new Kullanici();
+        OyunKaydi OyunKaydi = new OyunKaydi();
+
         int hiz = 100;
         private List<Circle> Snake = new List<Circle>();
         private Circle food = new Circle();
@@ -32,14 +38,28 @@ namespace YilanOyunu.UI
         private Keys customLeftKey;
         private Keys customRightKey;
 
+        // Yılan renkleri için değişkenler
+        private Color snakeHeadColor = Color.Black;
+        private Color snakeBodyColor = Color.DarkGreen;
+        private Color foodColor = Color.DarkRed;
+
+        public bool TusTakimiSecildiMi = false;
+
         public Form1()
         {
             InitializeComponent();
             new Settings();
+            this.KeyPreview = true;
+            highscore = _dbContext.OyunKaydi.Max(h => h.Skor);
+            lblHighScore.Text = highscore.ToString();
         }
         private void btnBasla_Click(object sender, EventArgs e)
         {
             RestartGame();
+            Kullanici.KullaniciAdi = txtKullaniciAdi.Text;
+            Kullanici.OyunSeviyesi = (OyunSeviyesi)Enum.Parse(typeof(OyunSeviyesi), lblGosterge.Text.Split(':')[1].Trim(), true);
+            _dbContext.Kullanici.Add(Kullanici);
+            _dbContext.SaveChanges();
         }
         private void GameTimer_Tick(object sender, EventArgs e)
         {
@@ -129,11 +149,11 @@ namespace YilanOyunu.UI
             {
                 if (i == 0)
                 {
-                    snakeColour = Brushes.Black;
+                    snakeColour = new SolidBrush(snakeHeadColor);
                 }
                 else
                 {
-                    snakeColour = Brushes.DarkGreen;
+                    snakeColour = new SolidBrush(snakeBodyColor);
                 }
 
                 canvas.FillEllipse(snakeColour, new Rectangle
@@ -144,7 +164,7 @@ namespace YilanOyunu.UI
                     ));
             }
 
-            canvas.FillEllipse(Brushes.DarkRed, new Rectangle
+            canvas.FillEllipse(new SolidBrush(foodColor), new Rectangle
             (
             food.X * Settings.Width,
             food.Y * Settings.Height,
@@ -164,7 +184,7 @@ namespace YilanOyunu.UI
             lblScore.Text = score.ToString();
 
             Circle head = new Circle { X = 10, Y = 5 };
-            Snake.Add(head); 
+            Snake.Add(head);
 
             for (int i = 0; i < 10; i++)
             {
@@ -207,18 +227,18 @@ namespace YilanOyunu.UI
                 lblHighScore.ForeColor = Color.Maroon;
                 lblHighScore.TextAlign = ContentAlignment.MiddleCenter;
             }
-                 DialogResult result = MessageBox.Show(
-                 "Oyunu yeniden ba�latmak istiyor musun?",  
-                 "Yeniden Ba�lat",                          
-                 MessageBoxButtons.YesNo,                   
-                 MessageBoxIcon.Question);
+            DialogResult result = MessageBox.Show(
+            "Oyunu yeniden başlatmak istiyor musun?",
+            "Yeniden Başlat",
+            MessageBoxButtons.YesNo,
+            MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
                 DialogResult otherResult = MessageBox.Show(
-                    "Zorluk seviyenizi de�i�tirmek istiyor musun?",  
-                    "SEV�YE",                         
-                 MessageBoxButtons.YesNo,                  
+                    "Zorluk seviyenizi değiştirmek istiyor musun?",
+                    "SEVİYE",
+                 MessageBoxButtons.YesNo,
                  MessageBoxIcon.Question);
                 if (otherResult == DialogResult.Yes)
                 {
@@ -233,8 +253,15 @@ namespace YilanOyunu.UI
             {
                 Application.Exit();
             }
-        }
 
+            OyunKaydi.KullaniciId = Kullanici.Id;
+            OyunKaydi.Skor = score;
+            OyunKaydi.OynamaTarihi = DateTime.Now;
+            OyunKaydi.Seviye = (OyunSeviyesi)Enum.Parse(typeof(OyunSeviyesi), lblGosterge.Text.Split(':')[1].Trim(), true);
+            _dbContext.OyunKaydi.Add(OyunKaydi);
+            _dbContext.SaveChanges();
+
+        }
         private void KeyIsDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == customLeftKey && Settings.directions != "right")
@@ -253,8 +280,9 @@ namespace YilanOyunu.UI
             {
                 goDown = true;
             }
+
         }
-        private void KeyIsUp(object? sender, KeyEventArgs e) // Fix for CS8622: Add nullable annotation to match the delegate's nullability.  
+        private void KeyIsUp(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == customLeftKey)
             {
@@ -282,27 +310,39 @@ namespace YilanOyunu.UI
         }
         private void btnKolay_Click(object sender, EventArgs e)
         {
+            if (!Gecis())
+            {
+                return;
+            }
             pnlGiris.Visible = false;
             GameTimer.Interval = 150;
             pnlGiris.Visible = false;
             hiz = GameTimer.Interval;
-            lblGosterge.Text = "SEV�YEN�Z : KOLAY";
+            lblGosterge.Text = "SEVİYENİZ : KOLAY";
         }
         private void btnOrta_Click(object sender, EventArgs e)
         {
+            if (!Gecis())
+            {
+                return;
+            }
             pnlGiris.Visible = false;
             GameTimer.Interval = 90;
             pnlGiris.Visible = false;
             hiz = GameTimer.Interval;
-            lblGosterge.Text = "SEV�YEN�Z : ORTA";
+            lblGosterge.Text = "SEVİYENİZ : ORTA";
         }
         private void btnZor_Click(object sender, EventArgs e)
         {
+            if (!Gecis())
+            {
+                return;
+            }
             pnlGiris.Visible = false;
             GameTimer.Interval = 50;
             pnlGiris.Visible = false;
             hiz = GameTimer.Interval;
-            lblGosterge.Text = "SEV�YEN�Z : ZOR";
+            lblGosterge.Text = "SEVİYENİZ : ZOR";
         }
         private void PanelKucultme()
         {
@@ -330,12 +370,148 @@ namespace YilanOyunu.UI
         }
         private void btnTusSecimi_Click(object sender, EventArgs e)
         {
-            customUpKey = (Keys)Enum.Parse(typeof(Keys), txtUpKey.Text.ToUpper());
-            customDownKey = (Keys)Enum.Parse(typeof(Keys), txtDownKey.Text.ToUpper());
-            customLeftKey = (Keys)Enum.Parse(typeof(Keys), txtLeftKey.Text.ToUpper());
-            customRightKey = (Keys)Enum.Parse(typeof(Keys), txtRightKey.Text.ToUpper());
 
-            MessageBox.Show("Tu�lar ba�ar�yla ayarland�!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            try
+            {
+                if (string.IsNullOrEmpty(txtDownKey.Text) || string.IsNullOrEmpty(txtLeftKey.Text) || string.IsNullOrEmpty(txtUpKey.Text) || string.IsNullOrEmpty(txtRightKey.Text))
+                {
+                    MessageBox.Show("TUŞ TAKIMINA GİRİŞ YAPMADAN BAŞLAYAMAZSINIZ ! ");
+                    return;
+                }
+                // Eğer tüm textbox'lar boşsa, varsayılan yön tuşlarını ata
+                if (string.IsNullOrWhiteSpace(txtUpKey.Text) &&
+                    string.IsNullOrWhiteSpace(txtDownKey.Text) &&
+                    string.IsNullOrWhiteSpace(txtLeftKey.Text) &&
+                    string.IsNullOrWhiteSpace(txtRightKey.Text))
+                {
+                    customUpKey = Keys.Up;
+                    customDownKey = Keys.Down;
+                    customLeftKey = Keys.Left;
+                    customRightKey = Keys.Right;
+
+                    MessageBox.Show("Varsayılan yön tuşları ayarlandı!", "Bilgi",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                // Eğer en az bir textbox doluysa, diğerlerinin de dolu olup olmadığını kontrol et
+                if (string.IsNullOrWhiteSpace(txtUpKey.Text) ||
+                    string.IsNullOrWhiteSpace(txtDownKey.Text) ||
+                    string.IsNullOrWhiteSpace(txtLeftKey.Text) ||
+                    string.IsNullOrWhiteSpace(txtRightKey.Text))
+                {
+                    MessageBox.Show("Lütfen tüm tuşları girin veya hepsini boş bırakın!", "Uyarı",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                if (txtUpKey.Text == txtDownKey.Text || txtLeftKey.Text == txtRightKey.Text || txtRightKey.Text == txtUpKey.Text || txtLeftKey.Text == txtDownKey.Text)
+                {
+                    MessageBox.Show("TUŞ TAKIMINDA AYNI KARAKTER SEÇİLEMEZ");
+                    return;
+                }
+                // Tüm textbox'lar doluysa, özel tuşları ata
+                customUpKey = (Keys)Enum.Parse(typeof(Keys), txtUpKey.Text, true);
+                customDownKey = (Keys)Enum.Parse(typeof(Keys), txtDownKey.Text, true);
+                customLeftKey = (Keys)Enum.Parse(typeof(Keys), txtLeftKey.Text, true);
+                customRightKey = (Keys)Enum.Parse(typeof(Keys), txtRightKey.Text, true);
+
+                MessageBox.Show("Özel tuşlar başarıyla ayarlandı!", "Bilgi",
+                               MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+            }
+            catch (ArgumentException)
+            {
+                MessageBox.Show("Geçersiz tuş girişi! Lütfen geçerli bir tuş adı girin.", "Hata",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            TusTakimiSecildiMi = true;
+        }
+        private void btnRenkSecimi_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Yılanın gövde rengini seçmek için 'Evet' tuşuna basın.",
+                "Renk Seçimi", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                if (colorDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    snakeBodyColor = colorDialog1.Color;
+                }
+            }
+            else
+            {
+
+            }
+
+            result = MessageBox.Show("Yem rengini değiştirmek ister misiniz?",
+                "Yem Rengi", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                if (colorDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    foodColor = colorDialog1.Color;
+                }
+            }
+
+            MessageBox.Show("Renkler başarıyla ayarlandı!", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void btnOption_Click(object sender, EventArgs e)
+        {
+            pnlGiris.Visible = true;
+        }
+
+        private void txtUpKey_KeyDown(object sender, KeyEventArgs e)
+        {
+            txtUpKey.Text = e.KeyCode.ToString();
+            e.SuppressKeyPress = true; // tuşun yazılmasını engeller, sadece isim gelir
+        }
+
+        private void txtDownKey_KeyDown(object sender, KeyEventArgs e)
+        {
+            txtDownKey.Text = e.KeyCode.ToString();
+            e.SuppressKeyPress = true;
+        }
+
+        private void txtRightKey_KeyDown(object sender, KeyEventArgs e)
+        {
+            txtRightKey.Text = e.KeyCode.ToString();
+            e.SuppressKeyPress = true;
+        }
+
+        private void txtLeftKey_KeyDown(object sender, KeyEventArgs e)
+        {
+            txtLeftKey.Text = e.KeyCode.ToString();
+            e.SuppressKeyPress = true;
+        }
+
+        private bool Gecis()
+        {
+            if (string.IsNullOrEmpty(txtDownKey.Text) || string.IsNullOrEmpty(txtLeftKey.Text) || string.IsNullOrEmpty(txtUpKey.Text) || string.IsNullOrEmpty(txtRightKey.Text))
+            {
+                MessageBox.Show("TUŞ TAKIMINA GİRİŞ YAPMADAN BAŞLAYAMAZSINIZ ! ");
+                return false;
+            }
+            if (!TusTakimiSecildiMi)
+            {
+                MessageBox.Show("TUŞ TAKIMINIZI ONAYLAYINIZ ! ");
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtKullaniciAdi.Text))
+            {
+                MessageBox.Show("KULLANICI ADINIZI UNUTMAYINN");
+                return false;
+            }
+           
+            return true;
+        }
+
+        private void btnOptions_Click(object sender, EventArgs e)
+        {
+            pnlGiris.Visible = true;
         }
     }
 }
